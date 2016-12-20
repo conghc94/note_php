@@ -1,0 +1,13 @@
+1. Get Todays date using FUEL PHP
+
+<? $date = \Session::get_flash('date');
+               if($date) {
+                 $fdate = \Date::create_from_string($date, '%d/%m/%Y');
+               }
+               $display = isset($fdate) ? date('d M Y', $fdate->get_timestamp()) : date('d M Y');
+               $set_date = isset($fdate) ? date('d/m/Y', $fdate->get_timestamp()) : date('d/m/Y');
+             ?>
+
+<input type="text" id="quickbook-picker" name="select-date" class="datepicker" value="<?= $display ?>" />
+
+2. 

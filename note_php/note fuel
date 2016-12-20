@@ -1,0 +1,42 @@
+1.Create Fuel Project
+	
+	/var/www/html/member_management_system/fuel/app/logs/
+
+	curl get.fuelphp.com/oil | sh
+	oil create <project_name>  member_management_system
+
+2.Create simpleauth
+	copy:	file auth,simpleauth from folder packages/auth/config to  app/config
+			file crypt from core/ to app/config
+	
+	config file:	database, config
+
+	run command:	oil refine migrate --packages=auth
+					oil generate admin pages title:string slug:string summary:text body:text publisher:int
+
+	create user:	oil generate model users username:varchar[50] password:string group:int email:string last_login:int login_hash:string profile_fields:text
+					oil refine migrate
+	
+					oil console
+					Auth::create_user('admin', '123456', 'admin@gmail.com', 100);
+					
+	Code Generation:	
+	
+3.Create Module
+	Config module in file config: 	'module_paths' => array(
+    														APPPATH.'modules'.DS,		// path to application modules
+    														APPPATH.'..'.DS.'globalmods'.DS	// path to our global modules
+															),
+	only module: 							php oil g module blog
+	module container model/comtroller :		php oil g module blog --folders=classes/model,classes/controller,config,lang
+
+3.
+Create module blog --full folders
+php oil g module blog --folders=classes/model,classes/controller,config,lang
+
+
+5. module command:
+	php oil g model post title:varchar[50] body:text user_id:int
+	php oil g model manager user_id:int name:varchar[100] address:varchar[255] position:varchar[100] phone:constraint:int[11] birthday:date
+	
+	run migrate:	php oil refine migrate

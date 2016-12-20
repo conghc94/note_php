@@ -1,0 +1,33 @@
+
+
+public function action_view($id = null) {
+        $query = \Model_Manager::query()
+                ->select('id', 'name', array(\DB::expr('`t1`.`email`'), 'email'), 
+                        'address', 'position', 'phone', 'birthday')
+                ->related('users', array('join_type' => 'inner'))
+                ->where('id', $id)
+                ->get();
+        $data['manager'] = $query;
+        echo '<pre>';
+        foreach ($data['manager'] as $val){
+            print_r($val->users->email);exit;
+        }
+        
+        $this->template->title = "Manager";
+        $this->template->content = View::forge('admin/managers/view', $data['manager']);
+    }
+    
+    
+    
+public function action_index() {
+        $query = \Model_Manager::query()
+                ->select('id', 'name', array(\DB::expr('`t1`.`email`'), 'email'), 'address', 'position', 'phone', 'birthday'
+                )
+                ->related('users', array('join_type' => 'inner'))
+                ->from_cache(false)
+                ->get();
+        
+        $data['managers'] = $query;
+        $this->template->title = 'Managers';
+        $this->template->content = View::forge('admin/managers/index', $data);
+    }

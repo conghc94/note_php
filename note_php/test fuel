@@ -1,0 +1,86 @@
+public function action_create() {
+        $data['managers'] = \Model_Manager::query()
+                ->select('id', 'name', array(\DB::expr('`t1`.`id`'), 'id_user'), array(\DB::expr('`t1`.`username`'), 'username_user'))
+                ->related('users', array('join_type' => 'inner'))
+                ->from_cache(false)
+                ->get();
+
+        if (Input::method() == 'POST') {
+            $val = Model_Manager::validate('create');
+            if ($val->run()) {
+                $manager = Model_Manager::forge(array(
+                            'name' => Input::post('name'),
+                            'user_id' => Input::post('user'),
+                            'email' => Input::post('email'),
+                            'position' => Input::post('position'),
+                            'address' => Input::post('address'),
+                            'phone' => Input::post('phone'),
+                            'birthday' => Input::post('birthday'),
+                ));
+                if ($manager and $manager->save()) {
+                    Session::set_flash('success', e('Added page #' . $manager->id . '.'));
+                    Response::redirect('admin/managers');
+                } else {
+                    Session::set_flash('error', e('Could not save page.'));
+                }
+            } else {
+                Session::set_flash('error', $val->error());
+            }
+        }
+        $this->template->title = "Manager";
+        $this->template->content = View::forge('admin/managers/create', $data);
+    }
+  $query = DB::select('managers.id','managers.name','users.username',
+                                'users.email','managers.address','managers.postition'
+                                ,'managers.phone','managers.birthday')
+                ->from('managers')->join('users')
+                ->on('managers.users_id','=','users.id')
+                ->order_by('managers.id','desc');
+        $manager = $query->as_object()->execute();
+		
+		
+		
+2. Query index:
+	$data['manager'] = \Model_Manager::query()
+                ->select('id', 'name', array(\DB::expr('`t1`.`email`'), 'user_email'), 'address', 'position', 'phone', 'birthday')
+                ->related('users', array('join_type' => 'inner'))
+                ->where('id', $id)
+                ->get();
+    
+	
+	
+	
+	
+	public function action_edit($id = null) {
+        $manager = Model_Manager::find($id);
+        $val = Model_Manager::validate('edit');
+        if ($val->run()) {
+            $manager->name = Input::post("name");
+            $manager->user_id = Input::post("user_id");
+            $manager->address = Input::post("address");
+            $manager->position = Input::post("position");
+            $manager->phone = Input::post("phone");
+            $manager->birthday = Input::post("birthday");
+
+            if ($mananger->save) {
+                Session::set_flash('success', e('Update mangar #' . $id));
+                Response::redirect('admin/managers');
+            } else {
+                Session::set_flash('error', e('Could not update manager #' . $id));
+            }
+        } else {
+            if (Input::method() == 'POST') {
+                $manager->name = $manager->validated('name');
+                $manager->user_id = $manager->validated('user_id');
+                $manager->address = $manager->validated('address');
+                $manager->position = $manager->validated('position');
+                $manager->phone = $manager->validated('phone');
+                $manager->birthday = $manager->validated('birthday');
+
+                Session:set_flash('error', $val->error());
+            }
+            $this->template->set_global('manager', $manager, false);
+        }
+        $this->template->title = "Manager";
+        $this->template->content = View::forge('admin/managers/edit');
+    }

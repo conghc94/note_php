@@ -1,0 +1,70 @@
+Config:
+	pagination
+
+public function action_index() {
+        $total_items = count(\Model_Manager::query()
+                             ->select('id')
+                             ->related('users', array('join_type' => 'inner'))
+                             ->from_cache(false)
+                             ->get());
+        $config = array(
+                    'pagination_url' => \Uri::create('admin/managers/index/'),
+                    'total_items'    => $total_items,
+                    'num_link'       => '5',
+                    'per_page'       => '5',
+                    'uri_segment'    => 'page',
+            );
+        $pagination = \Pagination::forge('conversionpagination', $config);
+                             
+        $data['managers'] = \Model_Manager::query()
+                ->select('id', 'name', array(\DB::expr('`t1`.`email`'), 'email'), 'address', 'position', 'phone', 'birthday'
+                )
+                ->related('users', array('join_type' => 'inner'))
+                ->rows_offset($pagination->offset)
+                ->rows_limit($pagination->per_page)
+                ->from_cache(false)
+                ->get();
+        $data['pagination'] = $pagination; 
+        
+        $this->template->title = 'Managers';
+        $this->template->content = View::forge('admin/managers/index', $data);
+}
+
+view : 
+<?php
+echo html_entity_decode($pagination);
+?>
+
+
+
+
+Thống kê chuyển đổi
+
+
+tiêu đề chuyển đổi
+[+$end_element = end($conversion_reach)+]      
+[+$end_element['title']+]
+
+ [+$no_counter=1+]     
+ [+if Session::get_flash('error') +]      
+ [+$error = Session::get_flash('error') +]
+ 
+ Có lỗi.
+ [+foreach $error as $one+][+$one+][+/foreach+]
+ 
+ [+/if +]
+ 
+ [+$pagina_counter = Pagination::instance('conversionpagination')+]
+ [+$no_counter = (($pagina_counter->current_page - 1) * $pagina_counter->per_page) + 1+]   
+  [+html_entity_decode($pagination)+]
+   [+foreach $conversion_reach as $onecase+]
+    [+/foreach+]
+	
+	
+	  NO
+	  ngày tháng và thời gian đạt được
+	đạt được mục gốc
+	[+$no_counter+++]        
+	[+Date::forge($onecase['conversion_created_at'])->format("%Y/%m/%d %H:%M:%S")+]
+	[+$onecase->conversionroute['id']+] : [+$onecase->conversionroute['title']+]
+	[+html_entity_decode($pagination)+]    
